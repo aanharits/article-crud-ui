@@ -12,15 +12,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "TicleCraft",
-  description: "Simplify your workflow and manage articles efficiently with style.",
-};
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} >
+      <head>
+        <title>PaperLane</title>
+        <link rel="icon" href="/logopaper.PNG" />
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {children}
         <Toaster closeButton />
       </body>

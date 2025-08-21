@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import api from '@/lib/axios'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@/components/ui/button'
-import { articleSchema } from '@/lib/articleSchema'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import { toast } from 'sonner'
+import api from "@/lib/api/axios";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { articleSchema } from "@/lib/schema/articleSchema";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 import {
     Dialog,
     DialogTrigger,
@@ -18,16 +18,16 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
-} from '@/components/ui/dialog'
-import { Pencil, Trash } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Pencil, Trash } from "lucide-react";
 
 export default function DashboardPage() {
-    const router = useRouter()
-    const [posts, setPosts] = useState([])
-    const [showForm, setShowForm] = useState(false)
-    const [viewArticle, setViewArticle] = useState(null)
-    const [isEditing, setIsEditing] = useState(false)
-    const [editPostId, setEditPostId] = useState(null)
+    const router = useRouter();
+    const [posts, setPosts] = useState([]);
+    const [showForm, setShowForm] = useState(false);
+    const [viewArticle, setViewArticle] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editPostId, setEditPostId] = useState(null);
 
     const {
         register,
@@ -39,170 +39,186 @@ export default function DashboardPage() {
     } = useForm({
         resolver: zodResolver(articleSchema),
         defaultValues: {
-            title: '',
-            author_name: '',
-            content: '',
+            title: "",
+            author_name: "",
+            content: "",
             published: false,
         },
-    })
+    });
 
-    const publishedValue = watch('published')
+    const publishedValue = watch("published");
 
     useEffect(() => {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem("token");
         if (!token) {
-            router.push('/auth/login')
-            return
+            router.push("/auth/login");
+            return;
         }
-        fetchPosts()
-    }, [])
+        fetchPosts();
+    }, []);
 
     const fetchPosts = async () => {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem("token");
         try {
-            const res = await api.get('/api/posts', {
+            const res = await api.get("/api/posts", {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-            })
-            setPosts(res.data.data)
+            });
+            setPosts(res.data.data);
         } catch (error) {
-            console.error('Error fetching posts:', error)
+            console.error("Error fetching posts:", error);
         }
-    }
+    };
 
     const handleCreate = async (data) => {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem("token");
         try {
-            await api.post('/api/posts', data, {
+            await api.post("/api/posts", data, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-            })
-            reset()
-            setShowForm(false)
-            fetchPosts()
+            });
+            reset();
+            setShowForm(false);
+            fetchPosts();
 
-            toast.success('Create Successfull!', {
-                position: 'top-right', 
-                duration: 4000,
+            toast.success("Create Successfull!", {
+                position: "top-right",
+                duration: 2000,
                 style: {
-                    fontSize: '21px',
-                    color: '#1A1F36',
-                    backgroundColor: '#D1D8BE',
+                    fontSize: "13px",
+                    color: "#1A1F36",
+                    backgroundColor: "#D1D8BE",
                 },
-                className: 'rounded-xl shadow-xl border-2 border-gray-800',
-            })
+                className: "rounded-xl shadow-xl border-2 border-gray-800",
+            });
         } catch (err) {
-            console.error('Gagal tambah artikel:', err.response?.data || err)
+            console.error("Gagal tambah artikel:", err.response?.data || err);
         }
-    }
+    };
 
     const handleUpdate = async (id, data) => {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem("token");
         try {
             await api.patch(`/api/posts/${id}`, data, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-            })
-            fetchPosts()
-            toast.success('Post Updated!', {
-                position: 'top-right',
-                duration: 4000,
+            });
+            fetchPosts();
+            toast.success("Post Updated!", {
+                position: "top-right",
+                duration: 2000,
                 style: {
-                    fontSize: '21px',
-                    color: '#1A1F36',
-                    backgroundColor: '#D1D8BE',
+                    fontSize: "13px",
+                    color: "#1A1F36",
+                    backgroundColor: "#D1D8BE",
                 },
-                className: 'rounded-xl shadow-xl border-2 border-gray-800',
-            })
+                className: "rounded-xl shadow-xl border-2 border-gray-800",
+            });
         } catch (err) {
-            console.error('Gagal update :', err.response?.data || err)
+            console.error("Gagal update :", err.response?.data || err);
         }
-    }
+    };
 
     const handleDelete = async (id) => {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem("token");
         try {
             await api.delete(`/api/posts/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
-            })
+            });
 
-            // Hapus post langsung dari state tanpa refetch
-            setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id))
+            setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
 
-            toast.success('Post Deleted!', {
-                position: 'top-right',
-                duration: 4000,
+            toast.success("Post Deleted!", {
+                position: "top-right",
+                duration: 2000,
                 style: {
-                    fontSize: '21px',
-                    color: '#1A1F36',
-                    backgroundColor: '#D1D8BE',
+                    fontSize: "13px",
+                    color: "#1A1F36",
+                    backgroundColor: "#D1D8BE",
                 },
-                className: 'rounded-xl shadow-xl border-2 border-gray-800',
-            })
+                className: "rounded-xl shadow-xl border-2 border-gray-800",
+            });
         } catch (err) {
-            console.error('Gagal hapus artikel:', err.response?.data || err)
+            console.error("Gagal hapus artikel:", err.response?.data || err);
         }
-    }
+    };
 
     const onSubmit = async (data) => {
         if (isEditing && editPostId) {
-            await handleUpdate(editPostId, data)
+            await handleUpdate(editPostId, data);
         } else {
-            await handleCreate(data)
+            await handleCreate(data);
         }
-        setIsEditing(false)
-        setEditPostId(null)
-        reset()
-        setShowForm(false)
-    }
+        setIsEditing(false);
+        setEditPostId(null);
+        reset();
+        setShowForm(false);
+    };
 
     return (
-        <div className="relative min-h-screen p-6 z-10 bg-gray-800">
+        <div className="relative min-h-screen p-4 sm:p-6 z-10 bg-gray-800">
+            {/* Header */}
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-accent-foreground text-shadow-lg/50">TicleCraft</h1>
-                <div className="flex space-x-2">
+                <h1 className="text-lg sm:text-2xl font-bold text-accent-foreground">
+                    TicleCraft
+                </h1>
+                <div className="flex gap-2 sm:gap-3">
+                    {/* Create Button */}
                     <Dialog open={showForm} onOpenChange={setShowForm}>
                         <DialogTrigger asChild>
-                            <Button className="bg-accent-foreground hover:bg-accent-foreground-60 shadow-6xl font-bold text-gray-700 transition-transform hover:scale-105 flex items-center justify-center">
-                                + Create Article
+                            <Button className="bg-accent-foreground hover:bg-accent-foreground-60 shadow-md font-semibold text-gray-700 transition-transform hover:scale-105 px-2 py-1 sm:px-3 sm:py-1 rounded-md text-xs sm:text-sm">
+                                + Create
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-lg bg-accent-foreground border-4 border-gray-700 rounded-xl text-gray-700">
+                        <DialogContent className="px-5 sm:px-6 bg-accent-foreground border-4 border-gray-700 rounded-xl text-gray-700">
                             <DialogHeader>
-                                <DialogTitle className="text-2xl font-bold text-center mb-2">Add Artikel</DialogTitle>
+                                <DialogTitle className="text-base sm:text-lg md:text-xl font-bold text-center mb-2">
+                                    Create Anything
+                                </DialogTitle>
                             </DialogHeader>
 
-                            {/* Form for creating a new article */}
-                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                            {/* Form */}
+                            <form
+                                onSubmit={handleSubmit(onSubmit)}
+                                className="space-y-3 sm:space-y-4 "
+                            >
                                 <div>
                                     <Input
-                                        {...register('title')}
+                                        {...register("title")}
                                         placeholder="Title"
-                                        className="w-full px-4 py-2 border text-black border-gray-800 bg-white rounded-lg focus:outline-none focus:ring-2"
+                                        className="w-full px-3 py-2 border text-black border-gray-800 bg-white rounded-lg text-sm sm:text-base"
                                     />
-                                    {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+                                    {errors.title && (
+                                        <p className="text-red-500 text-xs sm:text-sm mt-1">
+                                            {errors.title.message}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
                                     <Input
-                                        {...register('author_name')}
+                                        {...register("author_name")}
                                         placeholder="Author (optional)"
-                                        className="w-full px-4 py-2 border text-black border-gray-800 bg-white rounded-lg focus:outline-none focus:ring-2"
+                                        className="w-full px-3 py-2 border text-black border-gray-800 bg-white rounded-lg text-sm sm:text-base"
                                     />
                                 </div>
 
                                 <div>
                                     <Textarea
-                                        {...register('content')}
+                                        {...register("content")}
                                         placeholder="Content"
-                                        className="w-full h-32 resize-y px-4 py-2 border text-black border-gray-800 bg-white rounded-lg whitespace-pre-wrap break-words break-all"
+                                        className="w-full h-28 sm:h-32 resize-y px-3 py-2 border text-black border-gray-800 bg-white rounded-lg text-sm sm:text-base whitespace-pre-wrap break-words break-all"
                                     />
-                                    {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>}
+                                    {errors.content && (
+                                        <p className="text-red-500 text-xs sm:text-sm mt-1">
+                                            {errors.content.message}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="flex items-center space-x-2">
@@ -210,9 +226,14 @@ export default function DashboardPage() {
                                         className="border border-[#1A1F36]"
                                         id="published"
                                         checked={publishedValue}
-                                        onCheckedChange={(checked) => setValue('published', Boolean(checked))}
+                                        onCheckedChange={(checked) =>
+                                            setValue("published", Boolean(checked))
+                                        }
                                     />
-                                    <label htmlFor="published" className="text-sm font-medium">
+                                    <label
+                                        htmlFor="published"
+                                        className="text-xs sm:text-sm font-medium"
+                                    >
                                         Published?
                                     </label>
                                 </div>
@@ -221,13 +242,13 @@ export default function DashboardPage() {
                                     <Button
                                         type="button"
                                         onClick={() => setShowForm(false)}
-                                        className="bg-white text-black hover:bg-gray-100"
+                                        className="bg-white text-black hover:bg-gray-200 text-xs sm:text-sm"
                                     >
                                         Cancel
                                     </Button>
                                     <Button
                                         type="submit"
-                                        className="bg-gray-700 text-white hover:bg-gray-600"
+                                        className="bg-gray-900 text-white hover:bg-gray-600 text-xs sm:text-sm"
                                     >
                                         Submit
                                     </Button>
@@ -236,68 +257,107 @@ export default function DashboardPage() {
                         </DialogContent>
                     </Dialog>
 
-                    {/* // Logout Button */}
-                    <Button onClick={() => {
-                        localStorage.removeItem('token')
-                        router.push('/auth/login')
-                    }} className="bg-red-500 text-white hover:bg-red-500 font-bold transition-transform hover:scale-105">Logout</Button>
+                    {/* Logout Button */}
+                    <Button
+                        onClick={() => {
+                            localStorage.removeItem("token");
+                            router.push("/auth/login");
+                        }}
+                        className="bg-red-500 text-white hover:bg-red-600 font-semibold transition-transform hover:scale-105 px-2 py-1 sm:px-3 sm:py-1 rounded-md text-xs sm:text-sm"
+                    >
+                        Logout
+                    </Button>
                 </div>
             </div>
 
             {/* Display Articles */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-8">
                 {posts.map((post) => (
-                    <div key={post.id} className="bg-gray-900 p-4 border border-gray-700 rounded-xl">
+                    <div
+                        key={post.id}
+                        className="bg-gray-900 p-3 sm:p-4 border border-gray-700 rounded-xl shadow-lg h-full flex flex-col hover:scale-[1.03] sm:hover:scale-[1.05] transition-transform"
+                    >
                         <div className="flex justify-between items-start">
-                            <h2 className="text-xl font-bold text-white">{post.title}</h2>
-                            <span className={post.published ? 'text-green-400' : 'text-red-400'}>
-                                {post.published ? 'Published' : 'Draft'}
+                            <h2 className="text-base sm:text-lg font-bold text-white">
+                                {post.title}
+                            </h2>
+                            <span
+                                className={
+                                    post.published
+                                        ? "text-green-400 font-semibold text-xs sm:text-sm"
+                                        : "text-red-400 font-semibold text-xs sm:text-sm"
+                                }
+                            >
+                                {post.published ? "Published" : "Draft"}
                             </span>
                         </div>
-                        <hr className="my-2 border-gray-600" />
-                        <p className="text-gray-400 text-sm">Author: {post.author_name}</p>
-                        <p className="text-gray-300 text-sm mt-2 line-clamp-2">{post.content}</p>
 
-                        <div className="flex justify-between items-center mt-4">
-                            <Dialog open={viewArticle?.id === post.id} onOpenChange={(open) => setViewArticle(open ? post : null)}>
+                        <hr className="my-2 border-gray-600" />
+                        <p className="text-gray-400 text-xs sm:text-sm">
+                            Author: {post.author_name}
+                        </p>
+                        <p className="text-gray-300 text-sm sm:text-base mt-2 line-clamp-2">
+                            {post.content}
+                        </p>
+
+                        {/* Actions */}
+                        <div className="flex justify-between items-center mt-auto pt-3 sm:pt-4 gap-2">
+                            {/* View Article */}
+                            <Dialog
+                                open={viewArticle?.id === post.id}
+                                onOpenChange={(open) => setViewArticle(open ? post : null)}
+                            >
                                 <DialogTrigger asChild>
-                                    <Button size="sm" className="flex-1 bg-gray-800 text-white hover:bg-gray-700">
-                                        View Article
+                                    <Button
+                                        size="sm"
+                                        className="flex-1 bg-gray-800 text-white hover:bg-gray-700 text-xs sm:text-sm"
+                                    >
+                                        View
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="bg-accent-foreground text-black border-3 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-xl p-6">
+                                <DialogContent className="px-4 sm:px-6 bg-accent-foreground text-black border-3 border-gray-700 rounded-2xl shadow-xl">
                                     <DialogHeader>
-                                        <DialogTitle className="text-2xl font-bold">{post.title}</DialogTitle>
+                                        <DialogTitle className="text-lg sm:text-2xl font-bold">
+                                            {post.title}
+                                        </DialogTitle>
                                     </DialogHeader>
                                     <div className="space-y-2 mt-2">
-                                        <p className="text-gray-600 text-sm">Author: {post.author_name}</p>
+                                        <p className="text-gray-600 text-xs sm:text-sm">
+                                            Author: {post.author_name}
+                                        </p>
                                         <hr className="border-gray-400" />
-                                        <p className="whitespace-pre-wrap break-words text-gray-800 text-base">{post.content}</p>
+                                        <p className="whitespace-pre-wrap break-words text-gray-800 text-sm sm:text-base">
+                                            {post.content}
+                                        </p>
                                     </div>
                                     <DialogFooter className="mt-4">
-                                        <Button onClick={() => setViewArticle(null)} className="bg-gray-800 text-white hover:bg-gray-700">
+                                        <Button
+                                            onClick={() => setViewArticle(null)}
+                                            className="bg-gray-800 text-white hover:bg-gray-700 text-xs sm:text-sm"
+                                        >
                                             Close
                                         </Button>
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
 
+                            {/* Edit & Delete */}
                             <div className="flex gap-2">
                                 <Button
                                     size="icon"
                                     variant="ghost"
                                     className="hover:bg-gray-900 text-yellow-500 transition-transform hover:scale-105"
                                     onClick={() => {
-                                        setValue('title', post.title)
-                                        setValue('author_name', post.author_name)
-                                        setValue('content', post.content)
-                                        setValue('published', post.published)
-                                        setIsEditing(true)
-                                        setEditPostId(post.id)
-                                        setShowForm(true)
+                                        setValue("title", post.title);
+                                        setValue("author_name", post.author_name);
+                                        setValue("content", post.content);
+                                        setValue("published", post.published);
+                                        setIsEditing(true);
+                                        setEditPostId(post.id);
+                                        setShowForm(true);
                                     }}
                                 >
-                                    <Pencil size={20} />
+                                    <Pencil size={16} />
                                 </Button>
                                 <Button
                                     size="icon"
@@ -305,7 +365,7 @@ export default function DashboardPage() {
                                     className="hover:bg-gray-900 text-red-500 transition-transform hover:scale-105"
                                     onClick={() => handleDelete(post.id)}
                                 >
-                                    <Trash size={20} />
+                                    <Trash size={16} />
                                 </Button>
                             </div>
                         </div>
@@ -313,5 +373,5 @@ export default function DashboardPage() {
                 ))}
             </div>
         </div>
-    )
+    );
 }
