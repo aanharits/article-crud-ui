@@ -164,8 +164,8 @@ export default function DashboardPage() {
         <div className="relative min-h-screen p-4 sm:p-6 z-10 bg-gray-800">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-lg sm:text-2xl font-bold text-accent-foreground">
-                    TicleCraft
+                <h1 className="text-xl sm:text-2xl font-bold text-accent-foreground">
+                    PaperLane
                 </h1>
                 <div className="flex gap-2 sm:gap-3">
                     {/* Create Button */}
